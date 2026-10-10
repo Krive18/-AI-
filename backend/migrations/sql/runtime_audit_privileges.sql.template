@@ -1,0 +1,52 @@
+-- Execute this template as the dedicated grant/security-administration principal,
+-- never as the migration principal or runtime principal. For MySQL 8, this principal
+-- needs global CREATE ROLE, DROP ROLE, ROLE_ADMIN; SELECT/INSERT WITH GRANT OPTION
+-- on the target audit_log table; SELECT/INSERT/UPDATE WITH GRANT OPTION on the
+-- target user_account table; and global CREATE USER or UPDATE on
+-- mysql.default_roles because SET DEFAULT ROLE targets another account. Replace all
+-- three identifiers before running; they are
+-- identifiers, not credentials. Do not put passwords in this file or on the command
+-- line.
+--
+-- Required execution order:
+-- 1. Run Alembic with the schema-only migration principal.
+-- 2. Ensure the runtime principal has no direct database privileges and no other
+--    granted roles. This script rebuilds only the dedicated runtime role.
+-- 3. Replace __DATABASE_NAME__, __RUNTIME_ROLE__, and __RUNTIME_PRINCIPAL__.
+--    __RUNTIME_PRINCIPAL__ must be a complete MySQL account expression, for example
+--    'runtime_user'@'10.%', including its own single quotes.
+-- 4. Run this script as the distinct grant/security-administration principal.
+-- 5. The independent read-only auditor must verify the resulting grants with SHOW
+--    GRANTS. The auditor receives only SELECT ON mysql.* and the minimum connection
+--    privilege; it receives no DCL, role-administration, or application-table write
+--    privilege. MySQL 8 requires SELECT on the mysql system schema to inspect
+--    another account or role. Run:
+--      SHOW GRANTS FOR __RUNTIME_PRINCIPAL__;
+--      SHOW GRANTS FOR `__RUNTIME_ROLE__`;
+--    The grant/security-administration principal does not perform this audit. The
+--    migration principal intentionally has no role/grant administration or mysql.user
+--    inspection responsibility; the runtime principal never receives mysql schema
+--    read access.
+--
+-- The runtime principal must be distinct from the migration principal. Do not grant
+-- the runtime role any schema-level DDL privilege, or UPDATE/DELETE on
+-- `__DATABASE_NAME__`.*. Add future runtime permissions per table, never with a
+-- broad `__DATABASE_NAME__`.* UPDATE/DELETE grant.
+
+DROP ROLE IF EXISTS `__RUNTIME_ROLE__`;
+CREATE ROLE `__RUNTIME_ROLE__`;
+
+GRANT SELECT, INSERT, UPDATE ON `__DATABASE_NAME__`.`user_account` TO `__RUNTIME_ROLE__`;
+GRANT SELECT, INSERT ON `__DATABASE_NAME__`.`audit_log` TO `__RUNTIME_ROLE__`;
+GRANT SELECT, INSERT, UPDATE ON `__DATABASE_NAME__`.`translation_project` TO `__RUNTIME_ROLE__`;
+GRANT SELECT, INSERT, UPDATE ON `__DATABASE_NAME__`.`translation_task` TO `__RUNTIME_ROLE__`;
+GRANT SELECT, INSERT ON `__DATABASE_NAME__`.`media_asset` TO `__RUNTIME_ROLE__`;
+GRANT SELECT, INSERT ON `__DATABASE_NAME__`.`source_segment` TO `__RUNTIME_ROLE__`;
+GRANT SELECT, INSERT ON `__DATABASE_NAME__`.`subtitle_segment` TO `__RUNTIME_ROLE__`;
+GRANT SELECT, INSERT ON `__DATABASE_NAME__`.`task_event` TO `__RUNTIME_ROLE__`;
+GRANT SELECT, INSERT, UPDATE ON `__DATABASE_NAME__`.`provider_config` TO `__RUNTIME_ROLE__`;
+GRANT SELECT, INSERT ON `__DATABASE_NAME__`.`provider_version` TO `__RUNTIME_ROLE__`;
+GRANT SELECT, INSERT ON `__DATABASE_NAME__`.`provider_price` TO `__RUNTIME_ROLE__`;
+GRANT SELECT, INSERT ON `__DATABASE_NAME__`.`ai_usage_record` TO `__RUNTIME_ROLE__`;
+GRANT `__RUNTIME_ROLE__` TO __RUNTIME_PRINCIPAL__;
+SET DEFAULT ROLE `__RUNTIME_ROLE__` TO __RUNTIME_PRINCIPAL__;

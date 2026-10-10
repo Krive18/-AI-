@@ -1,0 +1,1 @@
+"""Administrator log query routes."""

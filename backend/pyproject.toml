@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools==84.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "linguasphere-backend"
+version = "0.1.0"
+description = "Backend services for LinguaSphere"
+requires-python = ">=3.13"
+dependencies = [
+  "fastapi==0.141.1",
+  "uvicorn==0.52.4",
+  "pydantic==2.13.5",
+  "pydantic-settings==2.11.0",
+  "sqlalchemy==2.0.52",
+  "alembic==1.19.1",
+  "asyncmy==0.2.14",
+  "redis==8.1.0",
+  "argon2-cffi==25.1.0",
+  "python-ulid==4.0.1",
+  "cryptography==46.0.5",
+  "python-multipart==0.0.20",
+  "websockets==17.1",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest==9.1.1",
+  "pytest-asyncio==1.4.0",
+  "httpx==0.28.1",
+  "ruff==0.16.5",
+  "mypy==2.3.1",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+
+[tool.ruff]
+target-version = "py313"
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+
+[tool.setuptools.packages.find]
+include = ["app*"]

@@ -1,0 +1,44 @@
+# Repository workspaces and task artifacts
+.worktrees/
+.superpowers/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+backend/.venv/
+*.egg-info/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# Node.js
+node_modules/
+frontend/node_modules/
+dist/
+frontend/dist/
+coverage/
+playwright-report/
+test-results/
+
+# Local integration artifacts and private runtime storage
+.e2e/
+.runtime/
+backend/.ai_translation_private/
+release/
+
+# Design QA screenshots (archived copies live in docs/design-qa/)
+design-qa-*.png
+
+# Editors and operating systems
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+# 本地发布产物
+*.tar.gz
